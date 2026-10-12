@@ -5,9 +5,14 @@ import argparse
 import json
 import os
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
-REFS = Path(__file__).resolve().parents[1] / "references"
+SCRIPT = Path(__file__).resolve()
+SKILL = SCRIPT.parents[1]
+REFS = SKILL / "references"
+AGENT_CLIS = ("claude", "codex")
 
 LANGUAGES = {
     "react-typescript": "react-typescript.md",
@@ -36,6 +41,7 @@ def main() -> int:
     parser.add_argument("--languages", default="auto", help=f"Comma-separated style refs, or auto. Options: {','.join(LANGUAGES)}.")
     parser.add_argument("--force", action="store_true", help="Replace existing guides that have no generated markers.")
     parser.add_argument("--dry-run", action="store_true", help="Report planned changes without writing files.")
+    parser.add_argument("--agent", default="auto", choices=["auto", *AGENT_CLIS, "none"], help="Agent CLI to hand unresolved situations to. Agents running this skill pass none.")
     args = parser.parse_args()
 
     root = Path(args.project_root).expanduser().resolve()
@@ -45,19 +51,22 @@ def main() -> int:
     languages = parse_languages(args.languages, root)
     current = {name: read(root / name) for name in ("STYLE.md", "COMMIT.md", ".gitignore")}
     planned = {
-        "STYLE.md": merge(root / "STYLE.md", current["STYLE.md"], build("Style Guide", STYLE_INTRO, ["base-style.md", *(LANGUAGES[l] for l in languages)]), args.force),
-        "COMMIT.md": merge(root / "COMMIT.md", current["COMMIT.md"], build("Commit Guide", COMMIT_INTRO, ["commit.md"]), args.force),
+        "STYLE.md": merge(current["STYLE.md"], build("Style Guide", STYLE_INTRO, ["base-style.md", *(LANGUAGES[l] for l in languages)]), args.force),
+        "COMMIT.md": merge(current["COMMIT.md"], build("Commit Guide", COMMIT_INTRO, ["commit.md"]), args.force),
         ".gitignore": with_gitignore(current[".gitignore"]),
     }
 
     status = {}
     for name, text in planned.items():
-        status[name] = "created" if current[name] is None else "unchanged" if text == current[name] else "updated"
-        if not args.dry_run and text != current[name]:
+        status[name] = "needs-agent" if text is None else "created" if current[name] is None else "unchanged" if text == current[name] else "updated"
+        if not args.dry_run and text not in (None, current[name]):
             (root / name).write_text(text)
 
-    print(json.dumps({"project_root": str(root), "languages": languages, "dry_run": args.dry_run, "files": status}, indent=2))
-    return 0
+    handoffs = find_handoffs(root, planned)
+    print(json.dumps({"project_root": str(root), "languages": languages, "dry_run": args.dry_run, "files": status, "handoffs": handoffs}, indent=2))
+    if not handoffs or args.dry_run or args.agent == "none":
+        return 0
+    return run_agent(args.agent, root, handoffs)
 
 
 def parse_languages(value: str, root: Path) -> list[str]:
@@ -93,15 +102,42 @@ def build(title: str, intro: str, refs: list[str]) -> str:
     return f"# {title}\n\n{intro}\n\n{START}\n\n{body}\n\n{END}\n"
 
 
-def merge(path: Path, current: str | None, generated: str, force: bool) -> str:
+def merge(current: str | None, generated: str, force: bool) -> str | None:
     if current is None:
         return generated
     if MANAGED.search(current):
         block = MANAGED.search(generated).group(0)
         return MANAGED.sub(lambda _: block, current, count=1)
-    if force:
-        return generated
-    raise SystemExit(f"{path} exists without setup-conventions markers. Rerun with --force to replace it.")
+    return generated if force else None
+
+
+def find_handoffs(root: Path, planned: dict[str, str | None]) -> list[str]:
+    handoffs = [
+        f"{name} exists without generated markers. Restructure it as: `# Title`, intro line, an empty `{START}` / `{END}` block for the helper to fill, then the existing rules the references do not already cover."
+        for name in ("STYLE.md", "COMMIT.md")
+        if planned[name] is None
+    ]
+
+    agents = read(root / "AGENTS.md")
+    if agents is not None and not ("STYLE.md" in agents and "COMMIT.md" in agents):
+        # A STYLE.md pointer without a COMMIT.md one is what the older setup-style-guide skill left behind.
+        legacy = " It was set up by the older setup-style-guide skill, so expect a STYLE.md-only pointer and git rules that now belong in COMMIT.md." if "STYLE.md" in agents else ""
+        handoffs.append(f"AGENTS.md needs migrating: move style and git rules into the guides and add the pointer from SKILL.md.{legacy}")
+    return handoffs
+
+
+def run_agent(choice: str, root: Path, handoffs: list[str]) -> int:
+    situations = "\n".join(f"- {h}" for h in handoffs)
+    prompt = f"""Use the setup-conventions skill at {SKILL} (read its SKILL.md) in {root}. Its helper script wrote what it could and left these situations:
+
+{situations}
+
+Resolve each one following SKILL.md, then rerun `python3 {SCRIPT} --project-root {root} --agent none` and confirm it reports no handoffs."""
+
+    cli = next((c for c in AGENT_CLIS if shutil.which(c)), None) if choice == "auto" else choice
+    if cli is None or shutil.which(cli) is None:
+        raise SystemExit(f"No agent CLI found ({', '.join(AGENT_CLIS)}). Resolve these by hand:\n{situations}")
+    return subprocess.run([cli, prompt], cwd=root).returncode
 
 
 def with_gitignore(current: str | None) -> str | None:
