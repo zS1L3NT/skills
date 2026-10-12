@@ -36,7 +36,7 @@ COMMIT_INTRO = "Rules for every commit, branch, and pull request an AI agent mak
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Create or refresh the private STYLE.md and COMMIT.md guides.")
+    parser = argparse.ArgumentParser(description="Create or refresh the STYLE.md and COMMIT.md guides.")
     parser.add_argument("--project-root", default=".", help="Project to modify. Defaults to cwd.")
     parser.add_argument("--languages", default="auto", help=f"Comma-separated style refs, or auto. Options: {','.join(LANGUAGES)}.")
     parser.add_argument("--force", action="store_true", help="Replace existing guides that have no generated markers.")
@@ -53,12 +53,12 @@ def main() -> int:
     planned = {
         "STYLE.md": merge(current["STYLE.md"], build("Style Guide", STYLE_INTRO, ["base-style.md", *(LANGUAGES[l] for l in languages)]), args.force),
         "COMMIT.md": merge(current["COMMIT.md"], build("Commit Guide", COMMIT_INTRO, ["commit.md"]), args.force),
-        ".gitignore": with_gitignore(current[".gitignore"]),
+        ".gitignore": without_gitignore(current[".gitignore"]),
     }
 
     status = {}
     for name, text in planned.items():
-        status[name] = "needs-agent" if text is None else "created" if current[name] is None else "unchanged" if text == current[name] else "updated"
+        status[name] = "unchanged" if text == current[name] else "needs-agent" if text is None else "created" if current[name] is None else "updated"
         if not args.dry_run and text not in (None, current[name]):
             (root / name).write_text(text)
 
@@ -140,16 +140,12 @@ Resolve each one following SKILL.md, then rerun `python3 {SCRIPT} --project-root
     return subprocess.run([cli, prompt], cwd=root).returncode
 
 
-def with_gitignore(current: str | None) -> str | None:
-    text = current or ""
-    lines = {line.strip() for line in text.splitlines()}
-    missing = [f"/{name}" for name in ("STYLE.md", "COMMIT.md") if f"/{name}" not in lines and name not in lines]
-    if not missing:
-        return current
-
-    if text and not text.endswith("\n"):
-        text += "\n"
-    return text + "".join(f"{entry}\n" for entry in missing)
+def without_gitignore(current: str | None) -> str | None:
+    # Older versions gitignored the guides; worktrees need them tracked.
+    if current is None:
+        return None
+    ignored = {f"{prefix}{name}" for name in ("STYLE.md", "COMMIT.md") for prefix in ("", "/")}
+    return "".join(line for line in current.splitlines(keepends=True) if line.strip() not in ignored)
 
 
 def demote_headings(markdown: str) -> str:
