@@ -1,12 +1,12 @@
 ---
 name: setup-conventions
-description: Set up private STYLE.md and COMMIT.md guides in a project and migrate matching rules out of AGENTS.md.
+description: Set up STYLE.md and COMMIT.md guides in a project and migrate matching rules out of AGENTS.md.
 disable-model-invocation: true
 ---
 
 # Setup Conventions
 
-Gives a project two private, gitignored guides, each generated from this skill's references:
+Gives a project two git-tracked guides, each generated from this skill's references:
 
 - `STYLE.md`: code style only, from [base-style.md](references/base-style.md) plus the detected language references.
 - `COMMIT.md`: commit, branch, and pull request rules, from [commit.md](references/commit.md).
@@ -20,7 +20,7 @@ Gives a project two private, gitignored guides, each generated from this skill's
    python3 <skill-dir>/scripts/setup_conventions.py --project-root <project> --agent none
    ```
 
-   It detects languages (override with `--languages`), writes both guides, and adds `/STYLE.md` and `/COMMIT.md` to `.gitignore`. Generated content sits between `setup-conventions` markers and is refreshed on every rerun; content outside the markers is preserved. Situations it cannot resolve, such as a guide without markers or an `AGENTS.md` still awaiting migration (including legacy `setup-style-guide` projects), come back as `handoffs`: resolve each one in the steps below. Run by hand from a terminal without `--agent none`, the helper opens `claude` or `codex` with those handoffs instead.
+   It detects languages (override with `--languages`), writes both guides, and removes any `.gitignore` entries for them left by older versions, since worktrees only carry tracked files. Generated content sits between `setup-conventions` markers and is refreshed on every rerun; content outside the markers is preserved. Situations it cannot resolve, such as a guide without markers or an `AGENTS.md` still awaiting migration (including legacy `setup-style-guide` projects), come back as `handoffs`: resolve each one in the steps below. Run by hand from a terminal without `--agent none`, the helper opens `claude` or `codex` with those handoffs instead.
 3. Migrate `AGENTS.md` by hand, rule by rule, since sorting rules needs judgement:
    - Code-style rules move to `STYLE.md`; commit, branch, and pull request rules move to `COMMIT.md`.
    - Move a rule only when the guide lacks it or the rule is sharper, and place it after the closing marker so reruns keep it.
