@@ -31,7 +31,8 @@ Common gitmojis (full list at [gitmoji.dev](https://gitmoji.dev)):
 
 # Branches
 
-- Name new branches `ai/<short-kebab-description>`, independent of the AI tool. Before a pull request, move work off any tool-named branch (`claude/`, `codex/`, `t3code/`) onto an `ai/` branch.
+- Name new branches `ai/<short-kebab-description>`, independent of the AI tool.
+- **Rename, never fork.** When working on a tool-named branch (`claude/`, `codex/`, `t3code/`), rename it in place with `git branch -m ai/<short-kebab-description>` before the first push or pull request, so no tool-named branch is left behind. `git switch -c` or `git checkout -b` would create a second branch instead.
 
 # Pull Requests
 
