@@ -18,8 +18,10 @@ Keep the human in the loop for every change. Produce a change document the user 
 
 1. Read the actual source and identify the baseline by filename, version, or supplied date. Respect any section boundaries. If the source is unavailable, request it before inventing Find text.
 2. Draft edits against that baseline. List changes in document order and keep each entry independently reviewable. Combine edits to the same passage into one replacement so the user does not have to find text already changed by another entry.
-3. Verify every Find string against the source. Use a complete, searchable passage with enough context to locate the intended occurrence. When it repeats, specify the section and nearby text or expand the passage to make it unique. Use page numbers only as supplemental locators because pagination can change.
+3. Verify every Find string against the source. Use the smallest passage that is unique, usually a phrase or one sentence, so the user selects and pastes as little as possible. Find a whole paragraph only when the whole paragraph is rewritten. Split a paragraph with several small fixes into separate phrase-level entries, unless their Finds would overlap. When it repeats, specify the section and nearby text or expand the passage to make it unique. Use page numbers only as supplemental locators because pagination can change.
 4. Deliver the numbered list with a short opening that names the baseline, scope, and application status. For a long list, save it as a Markdown file and link it. Do not overwrite the source to create this artifact.
+
+When the user sends an updated source after a previous list, compare it with the previous baseline before drafting. Note which entries were applied, altered, or skipped. Treat skipped or altered entries as the user's preferences, and do not propose them again unless the user asks. If the user gives numbered notes, open the change document with a table that maps each note to the entries that address it.
 
 When revising an earlier change list, preserve entry numbers where possible and mark additions or withdrawals. For a consolidated version, resolve superseded proposals against the agreed baseline and state whether numbering has changed.
 
