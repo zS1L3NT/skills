@@ -5,7 +5,7 @@ description: Write, rewrite or review an academic report, assignment answer or s
 
 # Academic reports
 
-A report earns its marks when every claim is **backed**, the parts tell one **story**, and the prose reads like a person who knows the subject. Work in that order. A story built on an unbacked claim fails however well it reads, so evidence is a gate, and story and voice are judgement on top of it.
+A report earns its marks when every claim is **backed**, the parts build one **argument**, and the prose reads like a person who knows the subject. Work in that order. An argument built on an unbacked claim fails however well it reads, so evidence is a gate, and argument and voice are judgement on top of it.
 
 ## Pick the path
 
@@ -37,18 +37,22 @@ Cut a finding whose defence needs an unsupported assumption, a construct the rea
 
 The ledger is done when every claim in scope has a row and a verdict. State readiness only with the count ("41 of 43 claims verified, 2 unverified because ..."), and keep unverified rows visible.
 
-## Story
+## Argument
 
-- **Answer the question.** Map each part of each question to the sentence that answers it. Lead each answer with that sentence, then give the evidence and the limits.
-- **Spine.** One point, the subpoints that establish it, then the next point. A finding from an earlier section returns where it matters later, such as data problems found at the start coming back as limits of a model.
-- **Transitions.** A section opens from the last finding where the logic connects. The opener carries the link, so standalone signposts ("We next turn to...") go.
-- **Relevance.** Every sentence and every figure serves the point of its section. Cut the true but off-topic sentence.
-- **Concepts.** Introduce a term where the reader first needs it, in plain words, once.
-- **Endings.** A paragraph ends on its last piece of evidence or its implication. Recaps and stated lessons go.
-- **Labels.** Paragraph labels, if used, are short phrases saying what the paragraph does, applied consistently.
-- **Slides.** One message per slide, structured text over paragraphs, and evidence legible at presentation size. A complex chart's labels say exactly what is plotted.
+Answer each question by building a small argument from verified, in-scope evidence, and let the evidence decide the conclusion. This is the general flow, not a template for every paragraph. Use each move where the question and evidence call for it.
 
-The story is done when every part of every question maps to an answering sentence, every transition rests on a stated finding, and every sentence and figure maps to its section's point.
+- **Claim (macro theme).** Open with the sentence that answers the section's question.
+- **Paragraph.** One point each. The topic sentence (hyper theme) states it, the evidence is analysed, and the last sentence (hyper new) states the insight that evidence earns.
+- **Warrant.** Each premise reaches the claim through an assumption a marker would accept. Every "so", "because" and "therefore" states the relation the evidence supports.
+- **Progression.** Fit the paragraph to its topic sentence: **fan** gives each of its ideas its own sentences then draws them together, **linear** keeps one theme as every sentence's subject, and **zigzag** makes each sentence's new information the next sentence's subject.
+- **Fair representation.** Keep the evidence's scope and qualifiers, and report conflicting findings beside supporting ones.
+- **Rebuttal.** Where a marker would raise a real objection (a confounder, an outlier, repeated records), state it fairly and answer it with a check. An objection left standing qualifies the conclusion.
+- **Convergence (macro new).** The conclusion combines the paragraphs' insights into a consequence for the question, using only evidence already shown in the body. Each paragraph supports, qualifies or limits that conclusion.
+- **Cohesion.** One stable term per referent, "this" plus a noun for a clear referent, and certainty matched to the strength and scope of the whole claim.
+- **Fallacies.** Check for straw man, equivocation, false cause, hasty generalisation, false analogy, false dilemma and slippery slope.
+- **Relevance.** Every sentence and figure develops or qualifies the section's answer. Introduce a term where the reader first needs it. On slides, one message per slide, with evidence legible at presentation size.
+
+The argument is done when every question has an answering claim, every warrant holds, every paragraph's insight feeds the conclusion, every real objection is answered or reflected in the limits, and the conclusion uses only evidence already presented.
 
 ## Voice
 
@@ -66,5 +70,5 @@ Voice is done when every rewrite keeps the original's meaning and caveats, names
 
 ## Modes
 
-- **Write.** Build the ledger from verified evidence, outline the spine, draft, run the voice pass, then rerun the ledger on the draft.
-- **Review.** Fix the baseline, build the ledger, check the story, check the voice, all within the user's scope. Deliver every proposed edit through the `diffdoc` skill with its importance levels. Without diffdoc, give each edit an exact Find passage, its Replace text, a Comment, and a level (critical, useful or minor), grouped by section.
+- **Write.** Build the ledger from verified evidence, outline each section's point, paragraphs and conclusion, draft, run the voice pass, then rerun the ledger on the draft.
+- **Review.** Fix the baseline, build the ledger, check the argument, check the voice, all within the user's scope. Deliver every proposed edit through the `diffdoc` skill with its importance levels. Without diffdoc, give each edit an exact Find passage, its Replace text, a Comment, and a level (critical, useful or minor), grouped by section.
