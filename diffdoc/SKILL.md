@@ -17,19 +17,36 @@ Keep the human in the loop for every change. Produce a change document the user 
 ## Prepare the change list
 
 1. Read the actual source and identify the baseline by filename, version, or supplied date. Respect any section boundaries. If the source is unavailable, request it before inventing Find text.
-2. Draft edits against that baseline. List changes in document order and keep each entry independently reviewable. Combine edits to the same passage into one replacement so the user does not have to find text already changed by another entry.
+2. Draft edits against that baseline and give each one an importance level (below). Group entries under the source's own sections (question, chapter, slide), in document order. Within a section, list critical entries first, then useful, then minor, keeping document order inside each level. Keep each entry independently reviewable. Grade each fix and apply any threshold the user set before combining. Then combine retained fixes whose Find passages overlap into one replacement at their highest level, so the user does not have to find text already changed by another entry. Check that no replacement removes another entry's Find text.
 3. Verify every Find string against the source. Use the smallest passage that is unique, usually a phrase or one sentence, so the user selects and pastes as little as possible. Find a whole paragraph only when the whole paragraph is rewritten. Split a paragraph with several small fixes into separate phrase-level entries, unless their Finds would overlap. When it repeats, specify the section and nearby text or expand the passage to make it unique. Use page numbers only as supplemental locators because pagination can change.
-4. Deliver the numbered list with a short opening that names the baseline, scope, and application status. For a long list, save it as a Markdown file and link it. Do not overwrite the source to create this artifact.
+4. Deliver the numbered list with a short opening that names the baseline, scope, and application status, and counts the entries at each level. Choose where it goes (below). Do not overwrite the source to create this artifact.
 
 When the user sends an updated source after a previous list, compare it with the previous baseline before drafting. Note which entries were applied, altered, or skipped. Treat skipped or altered entries as the user's preferences, and do not propose them again unless the user asks. If the user gives numbered notes, open the change document with a table that maps each note to the entries that address it.
 
-When revising an earlier change list, preserve entry numbers where possible and mark additions or withdrawals. For a consolidated version, resolve superseded proposals against the agreed baseline and state whether numbering has changed.
+When revising an earlier change list, write the revision as the next version file, preserve entry numbers where possible and mark additions or withdrawals. For a consolidated version, resolve superseded proposals against the agreed baseline and state whether numbering has changed.
+
+## Chat or file
+
+Follow the user's stated choice ("just output here", "give me a file"). Otherwise, judge by how the user will apply the list:
+
+- **Chat:** a short list the user can apply in one sitting, roughly five entries or fewer with phrase-sized passages, or a quick answer inside an ongoing discussion.
+- **File:** anything longer, entries with long passages or tables, a list the user will work through over time or share, or one round in a series of revisions. Save it as Markdown in the project's output or revisions folder if one exists, link it, and summarise the levels in chat.
+
+Give each version of a change list its own file, numbered in the name (`report-diff-v1.md`, `report-diff-v2.md`), so earlier rounds stay intact for comparison. Edit an existing version in place only when the user explicitly asks to change that version.
+
+## Importance levels
+
+- **Critical:** a marker or reader would count it against the work. Examples are a wrong or unbacked claim, a part of the question left unanswered, a broken rule of the assignment, or a sentence that misleads.
+- **Useful:** the text is correct, but this clearly improves it. Examples are support that exists but is hard to see, a gap in the flow, or a subject left unnamed.
+- **Minor:** polish the user can skip at no cost, such as wording, consistency or formatting.
+
+Grade by consequence for the reader, not by the size of the edit. A one-word fix that corrects a claim is critical, and so is missing support or an unnamed subject that makes a claim misleading or an answer incomplete. When the user sets a threshold ("critical only"), review everything, list only the entries at or above it, and state how many entries below it were left out. Skip single-word style swaps unless they change meaning.
 
 ## Entry format
 
-Use this structure for ordinary replacements. The labels belong outside the copyable passages.
+Use this structure for ordinary replacements, under a heading for the source section. The labels belong outside the copyable passages.
 
-### 1. Short description or section
+### 1. [Critical] Short description
 
 **Find:**
 
@@ -62,4 +79,4 @@ Treat Replace All as a separate, explicitly stated operation only when every occ
 
 ## Final check
 
-The list is ready when every proposed change has an entry, every Find or anchor matches the named baseline, every replacement is complete, and applying entries in order creates no conflicting or hidden edits. Distinguish verified matches from editor-specific issues such as subscripts or line breaks that require manual selection. State application status accurately and keep unresolved choices visible.
+The list is ready when every proposed change has an entry and an importance level, every Find or anchor matches the named baseline, every replacement is complete, and applying entries in order creates no conflicting or hidden edits. Distinguish verified matches from editor-specific issues such as subscripts or line breaks that require manual selection. State application status accurately and keep unresolved choices visible.
